@@ -11,8 +11,9 @@ export interface OpenPullRequestsProvider {
 export class TestableEligiblePullRequestsRetriever implements EligiblePullRequestsRetriever {
     private openPullRequestsProvider: OpenPullRequestsProvider;
 
-    constructor(openPullRequestsProvider: OpenPullRequestsProvider) {
+    constructor(openPullRequestsProvider: OpenPullRequestsProvider, optOut: bool) {
         this.openPullRequestsProvider = openPullRequestsProvider;
+        this.optOut = optOut
     }
 
     async findEligiblePullRequests(ownerName: string, repoName: string): Promise<PullRequestInfo[]> {
@@ -30,7 +31,10 @@ export class TestableEligiblePullRequestsRetriever implements EligiblePullReques
     }
 
     private static isEligible(pullRequestInfo: PullRequestInfo): boolean {
-        if (!pullRequestInfo.labels.includes(OPT_IN_LABEL)) {
+        if (this.optOut && pullRequestInfo.labels.includes(OPT_OUT_LABEL)) {
+            info(`PR #${pullRequestInfo.number} has opted out of auto rebasing.`);
+            return false;
+        } else if (!pullRequestInfo.labels.includes(OPT_IN_LABEL)) {
             info(`PR #${pullRequestInfo.number} does not have the '${OPT_IN_LABEL}' label.`);
             return false;
         }

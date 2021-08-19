@@ -5,6 +5,8 @@ inputs:
   github_token:
     description: The GITHUB_TOKEN secret
     required: true
+  opt_out:
+    description: Change to opt-out mode, Auto rebase will rebase PRs unless they are labeled with the opt-out label.
 
 runs:
   using: 'node12'

@@ -17,6 +17,7 @@ import {info, debug} from '@actions/core';
 async function run(): Promise<void> {
     try {
         const github = new GitHub(getInput('github_token'));
+        const optOut = new GitHub(getInput('opt_out'));
         const startLimit = (await github.rateLimit.get()).data.rate;
         debug(`Rate limit at start: ${JSON.stringify(startLimit)}`);
 
@@ -26,6 +27,7 @@ async function run(): Promise<void> {
         );
         const eligiblePullRequestsRetriever: EligiblePullRequestsRetriever = new TestableEligiblePullRequestsRetriever(
             openPullRequestsProvider,
+            optOut,
         );
         const rebaser = new Rebaser(new RealGithubRebase((github as unknown) as Octokit));
         const labeler = new Labeler(openPullRequestsProvider, new GithubLabelPullRequestService(github));
